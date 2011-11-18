@@ -34,7 +34,7 @@ class CircleVis
       new Circle i * lambda / 2, (i % 2) is 0
 
   draw: (distance) ->
-    @wrapper.attr('transform', "translate(0 #{(SVG_HEIGHT - distance) / 2})")
+    @wrapper.attr('transform', "translate(#{SVG_WIDTH / 2} #{(SVG_HEIGHT - distance) / 2})")
     @cg[1].attr('transform', "translate(0 #{distance})")
     for group in @cg
       circles = group.selectAll('circle').data(@circles)
