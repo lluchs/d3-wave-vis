@@ -12,10 +12,14 @@ class Circle
     yb = d = distance
     k = (1/4) * Math.sqrt((Math.pow(ra + rb, 2) - d*d) * (d*d - Math.pow(ra - rb, 2)))
 
-    p = (1/2) * (xb + xa) + (1/2) * (yb - ya) * (ra*ra - rb*rb) / (d*d) + 2 * (yb - ya) * k / (d*d)
-    m = (1/2) * (xb + xa) + (1/2) * (yb - ya) * (ra*ra - rb*rb) / (d*d) - 2 * (yb - ya) * k / (d*d)
+    x1 = (1/2) * (xb + xa) + (1/2) * (xb - xa) * (ra*ra - rb*rb) / (d*d) + 2 * (yb - ya) * k / (d*d)
+    y1 = (1/2) * (yb + ya) + (1/2) * (yb - ya) * (ra*ra - rb*rb) / (d*d) - 2 * (xb - xa) * k / (d*d)
+    x2 = (1/2) * (xb + xa) + (1/2) * (xb - xa) * (ra*ra - rb*rb) / (d*d) - 2 * (yb - ya) * k / (d*d)
+    y2 = (1/2) * (yb + ya) + (1/2) * (yb - ya) * (ra*ra - rb*rb) / (d*d) + 2 * (xb - xa) * k / (d*d)
 
-    [p, m, m, p]
+    type = @high is other.high
+
+    [[x1, y1, type], [x2, y2, type]]
 
 class CircleVis
   SVG_WIDTH = 800
@@ -26,7 +30,8 @@ class CircleVis
     @wrapper = @svg.append 'svg:g'
     @cg = for name in ['top', 'bottom']
       @wrapper.append('svg:g').attr('id', name).attr('class', 'circles')
-    @generateCircles 60, 5
+    @intersections = @wrapper.append 'svg:g'
+    @generateCircles 60, 10
     @draw 300
 
   generateCircles: (lambda, num) ->
@@ -44,5 +49,20 @@ class CircleVis
       circles.attr('r', (d) -> d.radius)
         .attr('stroke', (d) -> if d.high then 'black' else 'grey')
       circles.exit().remove()
+
+    # find intersections
+    results = []
+    for c1 in @circles
+      for c2 in @circles
+        continue if c1 is c2
+        result = c1.intersection distance, c2
+        results = results.concat result if result
+
+    circles = @intersections.selectAll('circle').data results
+    circles.enter().append('svg:circle')
+      .attr('r', 5)
+    circles.attr('cx', (d) -> d[0]).attr('cy', (d) -> d[1])
+      .attr('fill', (d) -> if d[2] then 'red' else 'blue')
+    circles.exit().remove()
 
 new CircleVis '#vis > div'
