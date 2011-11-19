@@ -29,17 +29,16 @@
     return Circle;
   })();
   CircleVis = (function() {
-    var SVG_HEIGHT, SVG_WIDTH;
-    SVG_WIDTH = 800;
-    SVG_HEIGHT = 800;
     function CircleVis(sel) {
       var name;
+      this.width = Math.max(window.innerWidth - 100, 800);
+      this.height = Math.max(window.innerHeight, 800);
       this.vis = d3.select(sel);
       this.vis.selectAll('input').on('change', __bind(function() {
         return this.update();
       }, this));
       this.svg = d3.select(sel + '> div').append('svg:svg');
-      this.svg.attr('width', SVG_WIDTH).attr('height', SVG_HEIGHT);
+      this.svg.attr('width', this.width).attr('height', this.height);
       this.wrapper = this.svg.append('svg:g');
       this.cg = (function() {
         var _i, _len, _ref, _results;
@@ -78,7 +77,7 @@
     };
     CircleVis.prototype.draw = function(distance) {
       var c1, c2, circles, group, result, results, _i, _j, _k, _len, _len2, _len3, _ref, _ref2, _ref3;
-      this.wrapper.attr('transform', "translate(" + (SVG_WIDTH / 2) + " " + ((SVG_HEIGHT - distance) / 2) + ")");
+      this.wrapper.attr('transform', "translate(" + (this.width / 2) + " " + ((this.height - distance) / 2) + ")");
       this.cg[1].attr('transform', "translate(0 " + distance + ")");
       _ref = this.cg;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {

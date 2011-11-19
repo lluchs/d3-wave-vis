@@ -24,13 +24,13 @@ class Circle
     [[x1, y1, type], [x2, y2, type]]
 
 class CircleVis
-  SVG_WIDTH = 800
-  SVG_HEIGHT = 800
   constructor: (sel) ->
+    @width = Math.max window.innerWidth - 100, 800
+    @height = Math.max window.innerHeight, 800
     @vis = d3.select(sel)
     @vis.selectAll('input').on 'change', => @update()
     @svg = d3.select(sel + '> div').append 'svg:svg'
-    @svg.attr('width', SVG_WIDTH).attr('height', SVG_HEIGHT)
+    @svg.attr('width', @width).attr('height', @height)
     @wrapper = @svg.append 'svg:g'
     @cg = for name in ['top', 'bottom']
       @wrapper.append('svg:g').attr('id', name).attr('class', 'circles')
@@ -52,7 +52,7 @@ class CircleVis
       new Circle i * lambda / 2, (i % 2) is 0
 
   draw: (distance) ->
-    @wrapper.attr('transform', "translate(#{SVG_WIDTH / 2} #{(SVG_HEIGHT - distance) / 2})")
+    @wrapper.attr('transform', "translate(#{@width / 2} #{(@height - distance) / 2})")
     @cg[1].attr('transform', "translate(0 #{distance})")
     for group in @cg
       circles = group.selectAll('circle').data(@circles)
