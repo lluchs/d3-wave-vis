@@ -83,7 +83,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         group = _ref[_i];
         circles = group.selectAll('circle').data(this.circles);
-        circles.enter().append('svg:circle').attr('fill', 'transparent').attr('stroke-width', 3);
+        circles.enter().append('svg:circle').attr('fill', 'none').attr('stroke-width', 3);
         circles.attr('r', function(d) {
           return d.radius;
         }).attr('stroke', function(d) {

@@ -57,7 +57,7 @@ class CircleVis
     for group in @cg
       circles = group.selectAll('circle').data(@circles)
       circles.enter().append('svg:circle')
-        .attr('fill', 'transparent')
+        .attr('fill', 'none')
         .attr('stroke-width', 3)
       circles.attr('r', (d) -> d.radius)
         .attr('stroke', (d) -> if d.high then 'black' else 'grey')
