@@ -1,5 +1,6 @@
 (function() {
   var Circle, CircleVis;
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   Circle = (function() {
     function Circle(radius, high) {
       this.radius = radius;
@@ -19,6 +20,9 @@
       y1 = (1 / 2) * (yb + ya) + (1 / 2) * (yb - ya) * (ra * ra - rb * rb) / (d * d) - 2 * (xb - xa) * k / (d * d);
       x2 = (1 / 2) * (xb + xa) + (1 / 2) * (xb - xa) * (ra * ra - rb * rb) / (d * d) - 2 * (yb - ya) * k / (d * d);
       y2 = (1 / 2) * (yb + ya) + (1 / 2) * (yb - ya) * (ra * ra - rb * rb) / (d * d) + 2 * (xb - xa) * k / (d * d);
+      if (isNaN(x1)) {
+        return;
+      }
       type = this.high === other.high;
       return [[x1, y1, type], [x2, y2, type]];
     };
@@ -30,7 +34,11 @@
     SVG_HEIGHT = 800;
     function CircleVis(sel) {
       var name;
-      this.svg = d3.select(sel).append('svg:svg');
+      this.vis = d3.select(sel);
+      this.vis.selectAll('input').on('change', __bind(function() {
+        return this.update();
+      }, this));
+      this.svg = d3.select(sel + '> div').append('svg:svg');
       this.svg.attr('width', SVG_WIDTH).attr('height', SVG_HEIGHT);
       this.wrapper = this.svg.append('svg:g');
       this.cg = (function() {
@@ -44,9 +52,19 @@
         return _results;
       }).call(this);
       this.intersections = this.wrapper.append('svg:g');
-      this.generateCircles(60, 10);
-      this.draw(300);
+      this.update();
     }
+    CircleVis.prototype.update = function() {
+      var distance, lambda, num;
+      distance = +this.vis.select('#distance input').property('value');
+      lambda = +this.vis.select('#lambda input').property('value');
+      num = +this.vis.select('#num input').property('value');
+      this.vis.select('#distance td:last-child').text(distance);
+      this.vis.select('#lambda td:last-child').text(lambda);
+      this.vis.select('#num td:last-child').text(num);
+      this.generateCircles(lambda, num);
+      return this.draw(distance);
+    };
     CircleVis.prototype.generateCircles = function(lambda, num) {
       var i;
       return this.circles = (function() {
@@ -85,9 +103,6 @@
         _ref3 = this.circles;
         for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
           c2 = _ref3[_k];
-          if (c1 === c2) {
-            continue;
-          }
           result = c1.intersection(distance, c2);
           if (result) {
             results = results.concat(result);
@@ -111,5 +126,5 @@
     };
     return CircleVis;
   })();
-  new CircleVis('#vis > div');
+  new CircleVis('#vis');
 }).call(this);

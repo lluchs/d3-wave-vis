@@ -17,6 +17,8 @@ class Circle
     x2 = (1/2) * (xb + xa) + (1/2) * (xb - xa) * (ra*ra - rb*rb) / (d*d) - 2 * (yb - ya) * k / (d*d)
     y2 = (1/2) * (yb + ya) + (1/2) * (yb - ya) * (ra*ra - rb*rb) / (d*d) + 2 * (xb - xa) * k / (d*d)
 
+    return if isNaN(x1)
+
     type = @high is other.high
 
     [[x1, y1, type], [x2, y2, type]]
@@ -25,14 +27,25 @@ class CircleVis
   SVG_WIDTH = 800
   SVG_HEIGHT = 800
   constructor: (sel) ->
-    @svg = d3.select(sel).append 'svg:svg'
+    @vis = d3.select(sel)
+    @vis.selectAll('input').on 'change', => @update()
+    @svg = d3.select(sel + '> div').append 'svg:svg'
     @svg.attr('width', SVG_WIDTH).attr('height', SVG_HEIGHT)
     @wrapper = @svg.append 'svg:g'
     @cg = for name in ['top', 'bottom']
       @wrapper.append('svg:g').attr('id', name).attr('class', 'circles')
     @intersections = @wrapper.append 'svg:g'
-    @generateCircles 60, 10
-    @draw 300
+    @update()
+
+  update: ->
+    distance = +@vis.select('#distance input').property 'value'
+    lambda   = +@vis.select('#lambda input').property 'value'
+    num      = +@vis.select('#num input').property 'value'
+    @vis.select('#distance td:last-child').text distance
+    @vis.select('#lambda td:last-child').text lambda
+    @vis.select('#num td:last-child').text num
+    @generateCircles lambda, num
+    @draw distance
 
   generateCircles: (lambda, num) ->
     @circles = for i in [1..num]
@@ -54,7 +67,6 @@ class CircleVis
     results = []
     for c1 in @circles
       for c2 in @circles
-        continue if c1 is c2
         result = c1.intersection distance, c2
         results = results.concat result if result
 
@@ -65,4 +77,4 @@ class CircleVis
       .attr('fill', (d) -> if d[2] then 'red' else 'blue')
     circles.exit().remove()
 
-new CircleVis '#vis > div'
+new CircleVis '#vis'
